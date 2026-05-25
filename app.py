@@ -109,4 +109,4 @@ if st.button("🚀 Generate Highlighted Report", type="primary", disabled=not (c
         except Exception as e:
             st.error(f"Error: {str(e)}")
 
-st.info("The app is now running with most of the core structure. tkinter isnt needed on a web version so its been modified somewhat.. Let me know if you get any errors when processing real files (no .")
+st.info("The app is now running with most of the core structure. tkinter isnt needed on a web version so its been modified somewhat.. Let me know if you get any errors when processing real files )
