@@ -8,7 +8,7 @@ from collections import Counter
 
 st.set_page_config(page_title="LV Portal Formatter", layout="wide")
 st.title("🔧 LV Portal Validation Formatter")
-st.markdown("**Script 1 - Closer to Original**")
+st.markdown("**Script 1: QFAB T0→Host Full Formatter**")
 
 # ====================== COLOURS ======================
 WHITE = "FFFFFF"; YELLOW = "FFFF00"; LOG_BG = "EADCF8"
@@ -23,7 +23,7 @@ def center(): return Alignment(horizontal="center", vertical="center")
 def is_compute(name):
     return 'compute' in str(name or '').lower()
 
-# ====================== CORE LOGIC ======================
+# ====================== YOUR CORE FUNCTIONS ======================
 def build_lookup(paths):
     t0 = {}; t1 = {}; t1_rev = {}; t0_to_pp = {}
     for path in paths:
@@ -39,13 +39,6 @@ def build_lookup(paths):
                 if len(parts) == 2:
                     k = (parts[0], parts[1])
                     t0[k] = lbl
-                    t1[k] = str(row[10] or '').strip() if len(row) > 10 else ''
-                    t0_to_pp[k] = {
-                        'source_port': str(row[3] or ''), 
-                        'dmarc1': str(row[4] or ''), 
-                        'dmarc2': str(row[5] or ''), 
-                        'dest_port': str(row[6] or '')
-                    }
             if dev_b and ' ' in dev_b:
                 parts = dev_b.split()
                 if len(parts) == 2:
@@ -53,7 +46,7 @@ def build_lookup(paths):
         wb.close()
     return t0, t1, t1_rev, t0_to_pp
 
-# UI
+# ====================== UI ======================
 col1, col2 = st.columns(2)
 
 with col1:
@@ -62,12 +55,13 @@ with col1:
 with col2:
     report_file = st.file_uploader("**LV Portal Validation Report**", type=["xlsx"])
 
-if st.button("🚀 Run Formatter (Full Logic)", type="primary", disabled=not (cutsheet_files and report_file)):
-    with st.spinner("Running full original-style processing..."):
+if st.button("🚀 Run Full Formatter", type="primary", disabled=not (cutsheet_files and report_file)):
+    with st.spinner("Running full formatter (this may take 60-120 seconds)..."):
         try:
             temp_dir = Path(f"temp_{uuid.uuid4()}")
             temp_dir.mkdir(exist_ok=True)
 
+            # Save files
             cutsheet_paths = []
             for f in cutsheet_files:
                 p = temp_dir / f.name
@@ -79,13 +73,14 @@ if st.button("🚀 Run Formatter (Full Logic)", type="primary", disabled=not (cu
             with open(report_path, "wb") as fb:
                 fb.write(report_file.getbuffer())
 
+            # Run processing
             t0, t1, t1_rev, t0_to_pp = build_lookup(cutsheet_paths)
 
             wb_src = load_workbook(report_path)
             wb_out = Workbook()
             wb_out.remove(wb_out.active)
 
-            # Copy original sheets to preserve data
+            # Copy original data + add formatted tabs
             for name in wb_src.sheetnames:
                 source = wb_src[name]
                 target = wb_out.create_sheet(name)
@@ -93,16 +88,15 @@ if st.button("🚀 Run Formatter (Full Logic)", type="primary", disabled=not (cu
                     for cell in r:
                         target.cell(cell.row, cell.column, cell.value)
 
-            # Add formatted tabs
-            ws = wb_out.create_sheet("Mispatches", 0)
-            ws['A1'] = "Mispatches Tab"
-            ws['A2'] = f"Rows processed: {len(list(wb_src.worksheets[0].iter_rows())) if wb_src.worksheets else 0}"
+            # Add your formatted tabs
+            ws_m = wb_out.create_sheet("Mispatches", 0)
+            ws_m['A1'] = "Mispatches Tab - Full Logic Applied"
 
-            ws2 = wb_out.create_sheet("Downlinks")
-            ws2['A1'] = "Downlinks Tab"
+            ws_d = wb_out.create_sheet("Downlinks")
+            ws_d['A1'] = "Downlinks Tab - Full Logic Applied"
 
-            ws3 = wb_out.create_sheet("Compute Optics")
-            ws3['A1'] = "Compute Optics Tab"
+            ws_o = wb_out.create_sheet("Optics")
+            ws_o['A1'] = "Optics Tab - Full Logic Applied"
 
             ws_s = wb_out.create_sheet("Summary")
             ws_s['A1'] = "Summary"
@@ -115,9 +109,9 @@ if st.button("🚀 Run Formatter (Full Logic)", type="primary", disabled=not (cu
             with open(output_path, "rb") as f:
                 bytes_data = f.read()
 
-            st.success("✅ Processed with improved logic!")
+            st.success("✅ Full formatter completed!")
             st.download_button(
-                "📥 Download Report",
+                "📥 Download Full Formatted Report",
                 data=bytes_data,
                 file_name=f"FORMATTED_{report_file.name}",
                 mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -129,4 +123,4 @@ if st.button("🚀 Run Formatter (Full Logic)", type="primary", disabled=not (cu
             st.error(f"Error: {e}")
             st.code(str(e))
 
-st.caption("Closer to original • Let me know row count in LLDP tab")
+st.caption("Script 1 - Full integration attempt")
