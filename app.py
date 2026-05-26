@@ -1251,9 +1251,9 @@ def main():
         initial_sidebar_state="expanded"
     )
 
-    st.title("🔧 LV Portal Validation Formatter")
+    st.title("🔧 LV Portal Formatter - QFAB T0 to Host")
     st.markdown("""
-    **Streamlit web version** — converts LV Portal validation exports into a clean, color-coded multi-tab Excel report.
+    **Web version - no TKinter or windows com dialog, doesnt require python on local machine** 
     
     - Upload **GPU/Compute cutsheet(s)** (required)
     - Upload **LV Portal Validation Export** (required)
